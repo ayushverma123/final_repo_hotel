@@ -1,3 +1,4 @@
+import { CreateCustomerDto } from 'src/customer/dto/createCustomer-dto';
 import { NotFoundException } from '@nestjs/common/exceptions';
 import { JwtGuard } from '../guards/jwt.guard';   
 import { AuthService } from '../services/auth.service';  
@@ -21,16 +22,21 @@ export class AuthController {
   constructor(private readonly authService: AuthService,
               private readonly customerService: CustomerService) {}        
 
-  @Post('/login')
+  @Post('register')
+  async registerUser(@Body() createCustomerDto: CreateCustomerDto) {
+    return await this.customerService.create(createCustomerDto);
+  }
+
+  @Post('login')
   async login(@Body() data: LoginDto) {
     return await this.authService.logIn(data);
   }  
 
-  @Get('/getlogininfo')
+  @Get('getlogininfo')
   @UseGuards(JwtGuard)
   async getLoginInfo(@Req() req: any) {   
     const id = req.user.id;
-    const user = await this.authService.getbyid(id);
+    const user = await this.authService.getbyid(id);   
     return { user:user };
   }
 
@@ -40,7 +46,7 @@ export class AuthController {
     const otp = await this.customerService.generateOtp(email);
     return { message: 'OTP generated successfully', otp };
   }
- 
+
   @Put('reset-password')
   async verifyOtpAndResetPassword(
     @Body() body: { email: string, otp: string, newPassword: string 
