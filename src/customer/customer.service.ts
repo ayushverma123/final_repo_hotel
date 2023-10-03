@@ -1,7 +1,7 @@
 import { UpdateCustomerDto } from './dto/updateCustomer-dto';
 import * as bcrypt from 'bcrypt';
 import { CustomerInterfaceResponse } from './interface/CustomerResponse.interface';
-import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException,  } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, SortOrder } from 'mongoose';
@@ -13,7 +13,7 @@ import { comparePasswords } from 'src/auth/helpers/password';
 
 @Injectable()
 export class CustomerService {
-  constructor(@InjectModel(Customar.name) private readonly customerModel: Model<Customar>,
+  constructor(@InjectModel(Customar.name) private readonly customerModel: Model<Customar>,   
     @InjectModel(Otp.name) private readonly otpModel: Model<Otp>
   ) { }
 
@@ -211,6 +211,10 @@ export class CustomerService {
     const isMached = await comparePasswords(oldPassword, customer.password); 
     if (isMached == false) {
       throw new NotFoundException('Old password is wrong')
+    }
+
+    if (/\s/.test(newPassword)) {
+      throw new BadRequestException('Password should not contain any spaces');
     }
     const hashPasswordd = await bcrypt.hash(newPassword, 10);
     customer.password = hashPasswordd;
