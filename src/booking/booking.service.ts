@@ -17,33 +17,35 @@ export class BookingService {
   async createBooking(
     createBookingDto: CreateBookingDto,
     id: string
-  ): Promise<BookingInterfaceResponse | null > { 
+  ): Promise<BookingInterfaceResponse | null > {
+
     const {...bookingData } = createBookingDto;
     const customer = await this.customerModel.findById(id);
     const check= await this.customerModel.findOne({_id:id})
-    console.log(check);
-    console.log(id);
+    const ID= check._id.toString();
+
     if (!customer) {
       throw new NotFoundException("Invalid customer");
     }
-    const newBookingData = {
+    const newBookingData = { 
       ...bookingData,
-      customerID: customer._id,
+      customerID: customer._id,  
+      id:ID
     };
 
     const existingBooking = await this.bookingModel.findOne({
       hote_id: createBookingDto.hote_id,
-      _id:id
+      
     });
 
     if (existingBooking) {
       // Customer with the same details already exists, throw an error
       throw new NotFoundException('Booking already exist');
     }
-    else {
-      const createdBooking = await this.bookingModel.create(newBookingData);
+    else {   
+      const createdBooking = await this.bookingModel.create(newBookingData);    
       await createdBooking.save();
-
+           
       return {
         code: 200,
         message: 'Booking created successfully',
