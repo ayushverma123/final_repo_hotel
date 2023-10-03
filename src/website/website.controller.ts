@@ -1,3 +1,5 @@
+import { CustomerInterfaceResponse } from 'src/customer/interface/CustomerResponse.interface';
+import { UpdateCustomerDto } from 'src/customer/dto/updateCustomer-dto';
 import { NotFoundException } from '@nestjs/common/exceptions';
 import { LoginDto } from 'src/auth/models/login.dto';
 import { AuthService } from 'src/auth/services/auth.service';
@@ -37,6 +39,15 @@ export class WebsiteController {
     return this.hotelService.getFilteredHotels(queryDto);
   }
 
+  @UseGuards(JwtGuard)
+  @Put('updatebyid/:id')
+  async updateCustomer(
+    @Param('id') id: string,
+    @Body() updateCustomerDto: UpdateCustomerDto,
+  ): Promise<CustomerInterfaceResponse | null> {
+    return this.customerService.updateCustomer(id, updateCustomerDto);
+  }  
+  
    @UseGuards(JwtGuard)  
    @Post('create') 
     async createBooking(
@@ -48,13 +59,14 @@ export class WebsiteController {
     }
       
 
-  @UseGuards(JwtGuard)
-  @Put('change-password')
-  async changerCustomerPassword(
-    @Req() req: any,
-    @Body() body: { oldPassword: string , newPassword: string }): Promise<any> {
-    const id=req.user.id;
-    const { oldPassword, newPassword } = body;
+   @UseGuards(JwtGuard)
+   @Put('change-password')
+   async changerCustomerPassword(
+       @Req() req: any,
+       @Body() body: { oldPassword: string , newPassword: string }
+    ): Promise<any> {
+       const id=req.user.id;
+       const { oldPassword, newPassword } = body;
 
     // Verify OTP and reset password
     const User = await this.customerService.getCustomerById(id);
