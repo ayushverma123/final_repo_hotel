@@ -40,7 +40,7 @@ export class HotelService {
   async getAllHotels(): Promise<any> {
     return this.hotelModel.find().exec();
   }
- 
+
   async getFilteredHotels(queryDto: GetQueryDto): Promise<any> {
     const { search,
             limit,
@@ -49,7 +49,11 @@ export class HotelService {
             fromDate, 
             toDate, 
             sortField, 
-            sortOrder
+            sortOrder,
+            hotel_name,
+            city,
+            state,
+            country
           } = queryDto;
     const query = this.hotelModel.find();
 
@@ -62,7 +66,23 @@ export class HotelService {
         { address: { $regex: search, $options: 'i' } },
       ]);
     }
-    
+
+    if (country) {
+      query.where({ hotel_name: { $regex: country, $options: 'i' } });
+    }
+
+    if (hotel_name) {
+      query.where({ hotel_name: { $regex: hotel_name, $options: 'i' } });
+    }
+
+    if (city) {
+      query.where({ hotel_name: { $regex: city, $options: 'i' } });
+    }
+
+    if (state) {
+      query.where({ hotel_name: { $regex: state, $options: 'i' } });
+    }
+
     if (pageNumber && pageSize) {
       const skip = (pageNumber - 1) * pageSize;
       query.skip(skip).limit(pageSize);
@@ -79,11 +99,11 @@ export class HotelService {
     const totalRecords = await this.hotelModel
     .find(query.getFilter())
     .countDocuments();
-  
+
     return { data, totalRecords };
   }
 
-  async getHotelById(id: string): Promise<HotelInterfaceResponse> {
+  async getHotelById(id: string): Promise<HotelInterfaceResponse> {   
     try {
       const Hotel = await this.hotelModel.findById(id).exec();
 
