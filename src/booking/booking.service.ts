@@ -1,3 +1,4 @@
+import { Hotel } from 'src/entities/hotel.entity';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common';    
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -12,16 +13,19 @@ import { ObjectId } from 'mongodb';
 @Injectable()
 export class BookingService {
   constructor(@InjectModel(Booking.name) private readonly bookingModel: Model<Booking>,   
-              @InjectModel(Customar.name) private readonly customerModel: Model<Customar>) { }
+              @InjectModel(Customar.name) private readonly customerModel: Model<Customar>,
+              @InjectModel(Hotel.name) private readonly hotelModel: Model<Hotel>,
+              ) { }
 
   async createBooking(
     createBookingDto: CreateBookingDto,
     id: string
   ): Promise<BookingInterfaceResponse | null > {
 
-    const {...bookingData } = createBookingDto;
+    const {hote_id,...bookingData } = createBookingDto;
     const customer = await this.customerModel.findById(id);
-    const check= await this.customerModel.findOne({_id:id})
+    const check= await this.customerModel.findOne({_id:id});
+    const hotel= await this.hotelModel.findById(hote_id);
     const ID= check._id.toString();
 
     if (!customer) {
@@ -29,7 +33,9 @@ export class BookingService {
     }
     const newBookingData = { 
       ...bookingData,
-      customerID: customer._id
+      customerID: customer._id,
+      hote_id: hotel._id,
+      hotel: hotel.hotel_name,
     };
 
     const existingBooking = await this.bookingModel.findOne({
