@@ -68,7 +68,7 @@ export class HotelService {
     }
 
     if (country) {
-      query.where({ hotel_name: { $regex: country, $options: 'i' } });
+      query.where({ country: { $regex: country, $options: 'i' } });
     }
 
     if (hotel_name) {
@@ -76,11 +76,11 @@ export class HotelService {
     }
 
     if (city) {
-      query.where({ hotel_name: { $regex: city, $options: 'i' } });
+      query.where({ city: { $regex: city, $options: 'i' } });
     }
 
     if (state) {
-      query.where({ hotel_name: { $regex: state, $options: 'i' } });
+      query.where({ state: { $regex: state, $options: 'i' } });
     }
 
     if (pageNumber && pageSize) {
