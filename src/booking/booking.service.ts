@@ -1,5 +1,5 @@
-import { Hotel } from 'src/entities/hotel.entity';
-import { InternalServerErrorException, NotFoundException } from '@nestjs/common';    
+import mongoose from 'mongoose';
+import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, SortOrder } from 'mongoose';
@@ -7,50 +7,51 @@ import { Booking } from 'src/entities/booking.entity';
 import { CreateBookingDto } from './dto/createBooking-dto';
 import { Customar } from 'src/entities/customer.entity';
 import { GetQueryDto } from './dto/query-dto';
-import { BookingInterfaceResponse } from './interface/BookingResponse-interface';   
+import { BookingInterfaceResponse } from './interface/BookingResponse-interface';
 import { ObjectId } from 'mongodb';
+import { Hotel } from 'src/entities/hotel.entity';
 
 @Injectable()
 export class BookingService {
-  constructor(@InjectModel(Booking.name) private readonly bookingModel: Model<Booking>,   
-              @InjectModel(Customar.name) private readonly customerModel: Model<Customar>,
-              @InjectModel(Hotel.name) private readonly hotelModel: Model<Hotel>,
-              ) { }
+  constructor(@InjectModel(Booking.name) private readonly bookingModel: Model<Booking>,
+    @InjectModel(Customar.name) private readonly customerModel: Model<Customar>,
+    @InjectModel(Hotel.name) private readonly hotelModel: Model<Hotel>
+  ) { }
 
   async createBooking(
     createBookingDto: CreateBookingDto,
     id: string
-  ): Promise<BookingInterfaceResponse | null > {
+  ): Promise<BookingInterfaceResponse | null> {
 
-    const {hote_id,...bookingData } = createBookingDto;
+    const { hote_id, ...bookingData } = createBookingDto;
     const customer = await this.customerModel.findById(id);
-    const check= await this.customerModel.findOne({_id:id});
-    const hotel= await this.hotelModel.findById(hote_id);
-    const ID= check._id.toString();
+    const hotel = await this.hotelModel.findById(hote_id);
 
     if (!customer) {
       throw new NotFoundException("Invalid customer");
     }
-    const newBookingData = { 
+    const newBookingData = {
       ...bookingData,
       customerID: customer._id,
-      hote_id: hotel._id,
       hotel: hotel.hotel_name,
+      customer_name: customer.firstName,
+      hote_id: hotel._id,
+      cusId: id
     };
 
     const existingBooking = await this.bookingModel.findOne({
-      hote_id: createBookingDto.hote_id
-      
+      hote_id: createBookingDto.hote_id,
+      cusId: id
     });
-
+   
     if (existingBooking) {
-      // Customer with the same details already exists, throw an error
       throw new NotFoundException('Booking already exist');
     }
-    else {   
-      const createdBooking = await this.bookingModel.create(newBookingData);    
+
+    else {
+      const createdBooking = await this.bookingModel.create(newBookingData);
       await createdBooking.save();
-           
+
       return {
         code: 200,
         message: 'Booking created successfully',
@@ -63,14 +64,14 @@ export class BookingService {
 
   async getFilteredBookings(queryDto: GetQueryDto): Promise<any> {
     const { search,
-            limit, 
-            pageNumber, 
-            pageSize, 
-            fromDate, 
-            toDate, 
-            sortField, 
-            sortOrder
-          } = queryDto;
+      limit,
+      pageNumber,
+      pageSize,
+      fromDate,
+      toDate,
+      sortField,
+      sortOrder
+    } = queryDto;
     const query = this.bookingModel.find();
 
     if (search) {
@@ -81,10 +82,12 @@ export class BookingService {
         { room_type: { $regex: search, $options: 'i' } },
       ]);
     }
+
     if (pageNumber && pageSize) {
       const skip = (pageNumber - 1) * pageSize;
       query.skip(skip).limit(pageSize);
     }
+
     if (fromDate && toDate) {
       query.where({
         booking_date: {
@@ -93,6 +96,7 @@ export class BookingService {
         },
       });
     }
+    
     if (sortField && sortOrder) {
       const sortOptions: [string, SortOrder][] = [
         [sortField, sortOrder as SortOrder]
@@ -102,8 +106,8 @@ export class BookingService {
 
     const data = await query.exec();
     const totalRecords = await this.bookingModel
-    .find(query.getFilter())
-    .countDocuments();
+      .find(query.getFilter())
+      .countDocuments();
     return { data, totalRecords };
   }
 
@@ -151,16 +155,16 @@ export class BookingService {
   async getBookingById(id: string): Promise<BookingInterfaceResponse> {
     try {
       const FoundBooking = await this.bookingModel
-      .findById(id)
-      .exec();
-  
-      if (!FoundBooking) {  
+        .findById(id)
+        .exec();
+
+      if (!FoundBooking) {
         throw new NotFoundException('Unable to find booking');
       }
       else {
         return {
           code: 200,
-          message: 'Booking found successfully',   
+          message: 'Booking found successfully',
           status: 'success',
           data: FoundBooking,
         };
@@ -178,12 +182,12 @@ export class BookingService {
   async updateBooking(
     id: string,
     updateBookingDto: CreateBookingDto
-  ): Promise<BookingInterfaceResponse> { 
+  ): Promise<BookingInterfaceResponse> {
     try {
       const updatedBooking = await this.bookingModel
-      .findByIdAndUpdate(id, updateBookingDto, { new: true })
-      .exec();
-          
+        .findByIdAndUpdate(id, updateBookingDto, { new: true })
+        .exec();
+
       if (!updatedBooking) {
         throw new NotFoundException('Unable to update booking');
       }
@@ -222,8 +226,8 @@ export class BookingService {
   async deleteBookingnew(id: string): Promise<BookingInterfaceResponse> {
     try {
       const deletedBooking = await this.bookingModel
-      .findByIdAndDelete(id)
-      .exec();
+        .findByIdAndDelete(id)
+        .exec();
 
       if (!deletedBooking) {
         throw new NotFoundException('Unable to delete booking');
@@ -246,7 +250,7 @@ export class BookingService {
       // Handle other potential errors or rethrow them
       throw error;
     }
-  }   
+  }
 
   async cancelBooking(id: string): Promise<BookingInterfaceResponse | null> {
     const deletedBooking = await this.bookingModel.findByIdAndDelete(id);
@@ -256,7 +260,7 @@ export class BookingService {
     }
     return {
       code: 200,
-      message: 'Booking canceled successfully',   
+      message: 'Booking canceled successfully',
       status: 'success',
       data: deletedBooking
     };
