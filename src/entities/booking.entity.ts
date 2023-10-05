@@ -1,6 +1,7 @@
+import { Customar } from './customer.entity';
 import mongoose from 'mongoose';  
 import { ObjectId } from 'mongodb';
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';   
 import { HydratedDocument } from 'mongoose';
 import { Hotel } from './hotel.entity';
 
@@ -25,6 +26,13 @@ export class Booking {
 
   @Prop({ type: String, required: true })
   identity_type: string;
+   
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: Customar.name, 
+    required: true 
+  })
+  cusId: ObjectId;
   
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
