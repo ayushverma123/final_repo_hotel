@@ -33,8 +33,7 @@ export class BookingService {
     };
 
     const existingBooking = await this.bookingModel.findOne({
-      hote_id: createBookingDto.hote_id,
-      id:ID
+      hote_id: createBookingDto.hote_id
       
     });
 
