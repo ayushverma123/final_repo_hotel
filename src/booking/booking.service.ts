@@ -40,7 +40,7 @@ export class BookingService {
     };
 
     const existingBooking = await this.bookingModel.findOne({
-      hote_id: createBookingDto.hote_id,
+      booking_date: createBookingDto.booking_date,
       cusId: id
     });
    
@@ -111,8 +111,18 @@ export class BookingService {
     return { data, totalRecords };
   }
 
-  async getTotalHotelCount(): Promise<number> {
-    return this.bookingModel.countDocuments({});
+  async getBookingsByCustomerId(cusId: string): Promise<Booking[]> {
+    try {
+      const bookings = await this.bookingModel
+      .find({ cusId: new ObjectId(cusId) })
+      .exec();
+      if (!bookings || bookings.length === 0) {
+        throw new NotFoundException('No bookings found for the customer');
+      }
+      return bookings;
+    } catch (error) {
+      throw new NotFoundException('Invalid customer ID');
+    }
   }
 
   async getAllBookings(): Promise<any> {
