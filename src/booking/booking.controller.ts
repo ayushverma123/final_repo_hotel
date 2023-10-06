@@ -1,3 +1,4 @@
+import { Booking } from 'src/entities/booking.entity';
 import { UseGuards } from '@nestjs/common';
 import { ApiOkResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import { ApiCreatedResponse, ApiForbiddenResponse } from '@nestjs/swagger';
@@ -20,7 +21,6 @@ export class BookingController {
   @Get('getall')
   async getBookings(@Query() queryDto: GetQueryDto): Promise<any> {
     return this.bookingService.getFilteredBookings(queryDto);
-
   }
   
   @UseGuards(JwtGuard)
@@ -29,6 +29,13 @@ export class BookingController {
   @Get('getbyid/:id')
   async getBookingById(@Param('id') id: string): Promise<BookingInterfaceResponse | null> {
     return this.bookingService.getBookingById(id);
+  }
+
+  @ApiOkResponse({ description: 'Successfully retrieved bookings for the customer.' })
+  @ApiNotFoundResponse({ description: 'Bookings not found for the customer.' })
+  @Get('getByCustomerId/:cusId')
+  async getBookingsByCustomerId(@Param('cusId') cusId: string): Promise<Booking[] | null> {
+    return this.bookingService.getBookingsByCustomerId(cusId);
   }
 
   @UseGuards(JwtGuard)
