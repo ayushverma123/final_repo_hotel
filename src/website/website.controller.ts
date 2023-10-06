@@ -1,12 +1,12 @@
-import { CustomerInterfaceResponse } from 'src/customer/interface/CustomerResponse.interface';
+import { Booking } from 'src/entities/booking.entity';
+import { CustomerInterfaceResponse } from 'src/customer/interface/CustomerResponse.interface';     
 import { UpdateCustomerDto } from 'src/customer/dto/updateCustomer-dto';
 import { NotFoundException } from '@nestjs/common/exceptions';
 import { LoginDto } from 'src/auth/models/login.dto';
 import { AuthService } from 'src/auth/services/auth.service';
 import { BookingService } from 'src/booking/booking.service';
 import { CreateBookingDto } from 'src/booking/dto/createBooking-dto';
-import { Controller, Get, Post, Put, Delete, Param, Body, Query, UseGuards, Request, UsePipes, ValidationPipe , Req} from '@nestjs/common';
-
+import { Controller, Get, Post, Put, Delete, Param, Body, Query, UseGuards, Request, UsePipes, ValidationPipe , Req} from '@nestjs/common'; 
 import { HotelService } from 'src/hotel/hotel.service';
 import { GetQueryDto } from 'src/hotel/dto/query-dto';
 import { BookingInterfaceResponse } from 'src/booking/interface/BookingResponse-interface';
@@ -19,7 +19,7 @@ export class WebsiteController {
         private readonly bookingService: BookingService,
         private readonly authService: AuthService,
         private readonly customerService: CustomerService
-  ) {}    
+  ) {}   
 
   @Post('login')
   async login(@Body() data: LoginDto) {
@@ -32,11 +32,16 @@ export class WebsiteController {
         const id = req.user.id;
         const user = await this.authService.getbyid(id);
         return { user: user };
-    }
+    } 
     
   @Get('getall')
   async getHotels(@Query() queryDto: GetQueryDto): Promise<any> {  
     return this.hotelService.getFilteredHotels(queryDto);
+  }   
+
+  @Get('getByCustomerId/:cusId')
+  async getBookingsByCustomerId(@Param('cusId') cusId: string): Promise<Booking[] | null> {
+    return this.bookingService.getBookingsByCustomerId(cusId);
   }
 
   @UseGuards(JwtGuard)
@@ -47,7 +52,7 @@ export class WebsiteController {
   ): Promise<CustomerInterfaceResponse | null> {
     return this.customerService.updateCustomer(id, updateCustomerDto);
   }  
-  
+
    @UseGuards(JwtGuard)  
    @Post('create') 
     async createBooking(
@@ -58,7 +63,6 @@ export class WebsiteController {
         return this.bookingService.createBooking(createBookingDto, id);
     }
       
-
    @UseGuards(JwtGuard)
    @Put('change-password')
    async changerCustomerPassword(
