@@ -15,11 +15,6 @@ export class UpdateCustomerDto {
     lastName: string;
 
     @ApiProperty()
-    @IsString()
-    @IsNotEmpty()
-    password: string;
-
-    @ApiProperty()
     @IsMobilePhone()
     @IsNotEmpty()
     mobileNo: number;
