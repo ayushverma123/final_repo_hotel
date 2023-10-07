@@ -10,11 +10,11 @@ export class GetQueryDto {
     @IsOptional()
     limit?: number;
 
-    @IsNumber()
+    //@IsNumber()
     @IsOptional()
     pageNumber: number;
 
-    @IsNumber()
+    //@IsNumber()
     @IsOptional()
     pageSize: number;
 
