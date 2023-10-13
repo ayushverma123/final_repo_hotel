@@ -42,7 +42,13 @@ export class Hotel {
   contact_email: string;
 
   @Prop({ type: [String], required: false, default: [] }) // An array of strings (image URLs)
-  image: string[];
+  images: string[];
+
+  @Prop({type: String, required: true})
+  category: string;
+
+  @Prop({type: String, required: true})
+  propertyType: string;
 
   @Prop({type: {
       lat: String,
