@@ -47,8 +47,8 @@ export class HotelController {
         if (file) {
             // If an image file is uploaded, you can handle it here
             // For example: save the file path to the database along with other data
-            const imagePath = file.path;
-            createHotelDto.image = imagePath;
+            const imagePaths = file ? [file.path] : []; 
+            createHotelDto.image = imagePaths;
         }
         
         return this.hotelService.createHotel(createHotelDto);
