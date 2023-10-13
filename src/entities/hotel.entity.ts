@@ -1,4 +1,4 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';       
 import { HydratedDocument } from 'mongoose';
   
 export type HotelDocument = HydratedDocument<Hotel>;
@@ -8,7 +8,7 @@ export class Hotel {
   @Prop({ type: String, required: true })
   hotel_name: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true }) 
   country: string;
 
   @Prop({ type: String, required: true })
@@ -40,6 +40,9 @@ export class Hotel {
 
   @Prop({type: String, required: true})
   contact_email: string;
+
+  @Prop({ type: [String], required: false, default: [] }) // An array of strings (image URLs)
+  images: string[];
 
   @Prop({type: {
       lat: String,
