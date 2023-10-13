@@ -86,10 +86,10 @@ export class HotelService {
       query.where({ state: { $regex: state, $options: 'i' } });
     }
     if (category) {
-      query.where({ country: { $regex: category, $options: 'i' } });
+      query.where({ category: { $regex: category, $options: 'i' } });
     }
     if (propertyType) {
-      query.where({ hotel_name: { $regex: propertyType , $options: 'i' } });
+      query.where({ propertyType: { $regex: propertyType , $options: 'i' } });
     }
 
     if (pageNumber && pageSize) {
