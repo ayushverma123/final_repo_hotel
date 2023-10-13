@@ -74,7 +74,7 @@ export class CreateHotelDto {
     @ArrayMinSize(1, { message: "At least one image URL is required" }) // Minimum number of images
     @ArrayMaxSize(5, { message: "Maximum of five images allowed" }) // Maximum number of images
     @IsOptional()
-    image: string; // Array of image URLs (optional, can be empty, minimum 1, maximum 5)
+    image: string[]; // Array of image URLs (optional, can be empty, minimum 1, maximum 5)
 
     @ApiProperty()
     @IsNumber()
