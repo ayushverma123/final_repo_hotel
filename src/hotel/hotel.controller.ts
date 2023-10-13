@@ -1,4 +1,4 @@
-
+import { Multer } from "multer";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { ApiOkResponse, ApiNotFoundResponse } from '@nestjs/swagger';
