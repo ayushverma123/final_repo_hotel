@@ -1,19 +1,20 @@
 import { Query } from 'mongoose';
 import { CastError, SortOrder } from 'mongoose';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';  
 import { InternalServerErrorException } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Hotel } from 'src/entities/hotel.entity';
 import { CreateHotelDto } from './dto/createHotel-dto';
-import { HotelInterfaceResponse } from './interface/HotelResponse.interface'; 
+import { HotelInterfaceResponse } from './interface/HotelResponse.interface';     
 import { GetQueryDto } from './dto/query-dto';
 
 @Injectable()
 export class HotelService {
   constructor(@InjectModel(Hotel.name) private readonly hotelModel: Model<Hotel>) { }
 
+  
   async createHotel(
     createHotelDto: CreateHotelDto
   ): Promise<HotelInterfaceResponse | null > {
@@ -37,11 +38,12 @@ export class HotelService {
     };
   }
 
+
   async getAllHotels(): Promise<any> {
     return this.hotelModel.find().exec();
   }
 
-  async getFilteredHotels(queryDto: GetQueryDto): Promise<any> {
+  async getFilteredHotels(queryDto: GetQueryDto): Promise<any> {    
     const { search,
             limit,
             pageNumber, 
@@ -53,13 +55,16 @@ export class HotelService {
             hotel_name,
             city,
             state,
-            country
+            country,
+            category,
+            propertyType,
+            houseRules
           } = queryDto;
     const query = this.hotelModel.find();
 
     if (search) {
       query.or([
-        { hotel_name: { $regex: search, $options: 'i' } },
+        { hotel_name: { $regex: search, $options: 'i' } },   
         { country: { $regex: search, $options: 'i' } },
         { state: { $regex: search, $options: 'i' } },
         { city: { $regex: search, $options: 'i' } },
@@ -74,20 +79,24 @@ export class HotelService {
     if (hotel_name) {
       query.where({ hotel_name: { $regex: hotel_name, $options: 'i' } });
     }
-
     if (city) {
       query.where({ city: { $regex: city, $options: 'i' } });
     }
-
     if (state) {
       query.where({ state: { $regex: state, $options: 'i' } });
+    }
+    if (category) {
+      query.where({ country: { $regex: category, $options: 'i' } });
+    }
+    if (propertyType) {
+      query.where({ hotel_name: { $regex: propertyType , $options: 'i' } });
     }
 
     if (pageNumber && pageSize) {
       const skip = (pageNumber - 1) * pageSize;
       query.skip(skip).limit(pageSize);
     }
-  
+
     if (sortField && sortOrder) {
       const sortOptions: [string, SortOrder][] = [[sortField, sortOrder as SortOrder]];
       query.sort(sortOptions);
