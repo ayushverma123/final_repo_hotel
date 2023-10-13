@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsObject, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsOptional, IsEmail,IsObject, IsNotEmpty, IsNumber, IsString, IsArray, ArrayMinSize, ArrayMaxSize } from "class-validator";
 
 export class CreateHotelDto {
 
@@ -11,14 +11,13 @@ export class CreateHotelDto {
     @ApiProperty()
     @IsString()
     @IsNotEmpty()
-    country: string;
+    country: string;   
 
     @ApiProperty()
     @IsString()
     @IsNotEmpty()
     state: string;
 
-    @ApiProperty()
     @IsString()
     @IsNotEmpty()
     city: string;
@@ -33,6 +32,17 @@ export class CreateHotelDto {
     @IsNotEmpty()
     address: string;
 
+    @IsString()
+    @IsNotEmpty()
+    category: string;
+
+    @IsString({ each: true }) // Validate each element as a string
+    @IsOptional()
+    houseRules: string[];
+
+    @IsString()
+    propertyType:string;
+    
     @ApiProperty()
     @IsObject()
     @IsNotEmpty()
@@ -56,7 +66,15 @@ export class CreateHotelDto {
     @ApiProperty()
     @IsString()
     @IsNotEmpty()
-    contact_person: string
+    contact_person: string;
+
+    @ApiProperty({ required: false })
+    @IsArray()
+    @IsString({ each: true }) // Validate each element of the array as a string
+    @ArrayMinSize(1, { message: "At least one image URL is required" }) // Minimum number of images
+    @ArrayMaxSize(5, { message: "Maximum of five images allowed" }) // Maximum number of images
+    @IsOptional()
+    image: string; // Array of image URLs (optional, can be empty, minimum 1, maximum 5)
 
     @ApiProperty()
     @IsNumber()
@@ -67,6 +85,8 @@ export class CreateHotelDto {
     @IsEmail()
     @IsNotEmpty()
     contact_email: string;
+
+
 }
 
 
