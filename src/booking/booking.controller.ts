@@ -18,6 +18,7 @@ export class BookingController {
   constructor(private readonly bookingService: BookingService) { }
 
   @UseGuards(JwtGuard)
+  @UseGuards()
   @Get('getall')
   async getBookings(@Query() queryDto: GetQueryDto): Promise<any> {
     return this.bookingService.getFilteredBookings(queryDto);
